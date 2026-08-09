@@ -1,3 +1,13 @@
+// Инициализация данных
+let users = JSON.parse(localStorage.getItem('users')) || [];
+let messages = JSON.parse(localStorage.getItem('messages')) || [];
+
+let selectedUser = null;
+
+function saveData() {
+    localStorage.setItem('messages', JSON.stringify(messages));
+}
+
 let selectedUser = null;
 
 document.addEventListener('DOMContentLoaded', function() {
