@@ -1,161 +1,32 @@
-// Инициализация данных
-let users = JSON.parse(localStorage.getItem('users')) || [];
-let messages = JSON.parse(localStorage.getItem('messages')) || [];
-
-let selectedUser = null;
-
-function saveData() {
-    localStorage.setItem('messages', JSON.stringify(messages));
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    if (localStorage.getItem('currentUser') !== 'admin') {
-        window.location.href = 'index.html';
-        return;
-    }
-
-    initializeAdminPanel();
-
-    document.getElementById('logoutBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        localStorage.removeItem('currentUser');
-        window.location.href = 'index.html';
-    });
-});
-
-function initializeAdminPanel() {
-    loadUsers();
-}
-
-function loadUsers() {
-    const usersList = document.getElementById('usersList');
-    if (!usersList) {
-        console.error('Элемент #usersList не найден');
-        return;
-    }
-
-    usersList.innerHTML = '';
-
-    const uniqueUsers = [...new Set(messages.filter(m => m.username !== 'admin').map(m => m.username))];
-
-    uniqueUsers.forEach(username => {
-        const userEl = document.createElement('div');
-        userEl.className = 'user-item';
-        userEl.textContent = username;
-        userEl.addEventListener('click', (e) => selectUser(username, e));
-        usersList.appendChild(userEl);
-    });
-}
-
-function selectUser(username, event) {
-    // Обновляем состояние
-    selectedUser = username;
-
-    // Визуальное выделение
-    document.querySelectorAll('.user-item').forEach(el => el.classList.remove('active'));
-    event.currentTarget.classList.add('active');
-
-    console.log('Выбран пользователь:', username);
-
-    updateChatInterface(username);
-}
-
-function updateChatInterface(username) {
-    const chatArea = document.getElementById('chatArea');
-    if (!chatArea) {
-        console.error('Элемент #chatArea не найден');
-        return;
-    }
-
-    chatArea.innerHTML = `
-        <div class="header">
-            <h2>Диалог с ${username}</h2>
-            <button class="close-dialog" onclick="closeDialog()">Закрыть диалог</button>
-        </div>
-        <div class="message-list" id="adminMessageList"></div>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Чат пользователя</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .chat-container { display: flex; flex-direction: column; height: 90vh; max-width: 600px; margin: 0 auto; }
+        #userGreeting { text-align: center; font-size: 18px; margin: 10px 0; }
+        #messageList { flex: 1; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+        .message { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .user-message { background: #e3f2fd; }
+        .admin-message { background: #f3e5f5; }
+        .message-input { display: flex; gap: 10px; }
+        #userMessage { flex: 1; padding: 10px; }
+        #sendBtn, #logoutBtn { padding: 10px; }
+        #logoutBtn { background: #dc3545; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <h2 id="userGreeting"></h2>
+        <div id="messageList"></div>
         <div class="message-input">
-            <textarea id="adminMessage" placeholder="Ответьте пользователю..." rows="3"></textarea>
-            <button id="adminSendBtn">Отправить</button>
-        </div>`;
+            <textarea id="userMessage" placeholder="Введите сообщение..." rows="3"></textarea>
+            <button id="sendBtn">Отправить</button>
+        </div>
+        <button id="logoutBtn">Выйти</button>
+    </div>
 
-    loadConversation(username);
-}
-
-function loadConversation(username) {
-    const adminMessageList = document.getElementById('adminMessageList');
-    if (!adminMessageList) {
-        console.error('Элемент #adminMessageList не найден');
-        return;
-    }
-
-    adminMessageList.innerHTML = '';
-
-    const conversation = messages.filter(m =>
-        (m.username === username && m.targetUser === 'admin') ||
-        (m.username === 'admin' && m.targetUser === username)
-    );
-
-    conversation.forEach(msg => {
-        const messageEl = document.createElement('div');
-        messageEl.className = msg.isAdmin ? 'message admin-message' : 'message user-message';
-        messageEl.innerHTML = `
-            <strong>${msg.isAdmin ? 'Администратор' : msg.username}</strong>
-            <span>${msg.timestamp}</span>
-            ${msg.ip ? `<small>IP: ${msg.ip}</small>` : ''}
-            <p>${msg.message}</p>
-        `;
-        adminMessageList.appendChild(messageEl);
-    });
-
-    // Перепривязываем обработчик отправки после пересоздания элементов
-    const sendBtn = document.getElementById('adminSendBtn');
-    if (sendBtn) {
-        sendBtn.removeEventListener('click', sendAdminMessage);
-        sendBtn.addEventListener('click', sendAdminMessage);
-    }
-}
-
-function sendAdminMessage() {
-    if (!selectedUser) {
-        alert('Сначала выберите пользователя!');
-        return;
-    }
-
-    const messageText = document.getElementById('adminMessage').value.trim();
-    if (!messageText) {
-        alert('Введите текст ответа!');
-        return;
-    }
-
-    const newMessage = {
-        id: Date.now(),
-        username: 'admin',
-        message: messageText,
-        timestamp: new Date().toLocaleString(),
-        ip: '127.0.0.1',
-        isAdmin: true,
-        targetUser: selectedUser
-    };
-
-    messages.push(newMessage);
-    saveData();
-    document.getElementById('adminMessage').value = '';
-    loadConversation(selectedUser);
-}
-
-function closeDialog() {
-    if (!selectedUser) return;
-
-    messages = messages.filter(m =>
-        !(m.username === selectedUser && m.targetUser === 'admin') &&
-        !(m.username === 'admin' && m.targetUser === selectedUser)
-    );
-    saveData();
-
-    loadUsers();
-    selectedUser = null;
-    const chatArea = document.getElementById('chatArea');
-    if (chatArea) {
-        chatArea.innerHTML = '<div class="no-selection">Выберите пользователя для начала диалога</div>';
-    }
-}
+    <script src="js/user.js"></script>
+</body>
+</html>
