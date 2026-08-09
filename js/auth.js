@@ -54,3 +54,9 @@ document.getElementById('loginForm')?.addEventListener('submit', function(e) {
         alert('Неверный логин или пароль!');
     }
 });
+// Инициализация хранилищ
+let users = JSON.parse(localStorage.getItem('users')) || [
+    { username: 'admin', password: 'admin', isAdmin: true }
+];
+let messages = JSON.parse(localStorage.getItem('messages')) || [];
+
