@@ -1,24 +1,21 @@
-// Инициализация данных — однократно в начале файла
+// Инициализация данных
 let users = JSON.parse(localStorage.getItem('users')) || [];
 let messages = JSON.parse(localStorage.getItem('messages')) || [];
 
-let selectedUser = null; // Единственное объявление переменной
+let selectedUser = null;
 
 function saveData() {
     localStorage.setItem('messages', JSON.stringify(messages));
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Проверка авторизации
     if (localStorage.getItem('currentUser') !== 'admin') {
         window.location.href = 'index.html';
         return;
     }
 
-    // Инициализация интерфейса
     initializeAdminPanel();
 
-    // Обработчик выхода
     document.getElementById('logoutBtn').addEventListener('click', function(e) {
         e.preventDefault();
         localStorage.removeItem('currentUser');
@@ -32,7 +29,10 @@ function initializeAdminPanel() {
 
 function loadUsers() {
     const usersList = document.getElementById('usersList');
-    if (!usersList) return;
+    if (!usersList) {
+        console.error('Элемент #usersList не найден');
+        return;
+    }
 
     usersList.innerHTML = '';
 
@@ -42,25 +42,51 @@ function loadUsers() {
         const userEl = document.createElement('div');
         userEl.className = 'user-item';
         userEl.textContent = username;
-        userEl.addEventListener('click', () => selectUser(username));
+        userEl.addEventListener('click', (e) => selectUser(username, e));
         usersList.appendChild(userEl);
     });
 }
 
-function selectUser(username) {
+function selectUser(username, event) {
+    // Обновляем состояние
     selectedUser = username;
 
-    // Обновляем визуальное состояние списка пользователей
+    // Визуальное выделение
     document.querySelectorAll('.user-item').forEach(el => el.classList.remove('active'));
-    event.target.classList.add('active');
+    event.currentTarget.classList.add('active');
 
-    // Загружаем диалог с выбранным пользователем
+    console.log('Выбран пользователь:', username);
+
+    updateChatInterface(username);
+}
+
+function updateChatInterface(username) {
+    const chatArea = document.getElementById('chatArea');
+    if (!chatArea) {
+        console.error('Элемент #chatArea не найден');
+        return;
+    }
+
+    chatArea.innerHTML = `
+        <div class="header">
+            <h2>Диалог с ${username}</h2>
+            <button class="close-dialog" onclick="closeDialog()">Закрыть диалог</button>
+        </div>
+        <div class="message-list" id="adminMessageList"></div>
+        <div class="message-input">
+            <textarea id="adminMessage" placeholder="Ответьте пользователю..." rows="3"></textarea>
+            <button id="adminSendBtn">Отправить</button>
+        </div>`;
+
     loadConversation(username);
 }
 
 function loadConversation(username) {
     const adminMessageList = document.getElementById('adminMessageList');
-    if (!adminMessageList) return;
+    if (!adminMessageList) {
+        console.error('Элемент #adminMessageList не найден');
+        return;
+    }
 
     adminMessageList.innerHTML = '';
 
@@ -81,27 +107,12 @@ function loadConversation(username) {
         adminMessageList.appendChild(messageEl);
     });
 
-    // Обновляем интерфейс чата
-    updateChatInterface(username);
-}
-
-function updateChatInterface(username) {
-    const chatArea = document.getElementById('chatArea');
-    if (!chatArea) return;
-
-    chatArea.innerHTML = `
-        <div class="header">
-            <h2>Диалог с ${username}</h2>
-            <button class="close-dialog" onclick="closeDialog()">Закрыть диалог</button>
-        </div>
-        <div class="message-list" id="adminMessageList"></div>
-        <div class="message-input">
-            <textarea id="adminMessage" placeholder="Ответьте пользователю..." rows="3"></textarea>
-            <button id="adminSendBtn">Отправить</button>
-        </div>`;
-
     // Перепривязываем обработчик отправки после пересоздания элементов
-    document.getElementById('adminSendBtn').addEventListener('click', sendAdminMessage);
+    const sendBtn = document.getElementById('adminSendBtn');
+    if (sendBtn) {
+        sendBtn.removeEventListener('click', sendAdminMessage);
+        sendBtn.addEventListener('click', sendAdminMessage);
+    }
 }
 
 function sendAdminMessage() {
@@ -135,14 +146,12 @@ function sendAdminMessage() {
 function closeDialog() {
     if (!selectedUser) return;
 
-    // Удаляем все сообщения диалога
     messages = messages.filter(m =>
         !(m.username === selectedUser && m.targetUser === 'admin') &&
         !(m.username === 'admin' && m.targetUser === selectedUser)
     );
     saveData();
 
-    // Обновляем список пользователей и очищаем область чата
     loadUsers();
     selectedUser = null;
     const chatArea = document.getElementById('chatArea');
