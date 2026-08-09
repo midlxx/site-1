@@ -1,12 +1,13 @@
+let selectedUser = null;
+
 document.addEventListener('DOMContentLoaded', function() {
     if (localStorage.getItem('currentUser') !== 'admin') {
         window.location.href = 'index.html';
         return;
     }
-    
+
     loadUsers();
-    loadConversations();
-    
+
     // Выход
     document.getElementById('logoutBtn').addEventListener('click', function(e) {
         e.preventDefault();
@@ -18,8 +19,8 @@ document.addEventListener('DOMContentLoaded', function() {
 function loadUsers() {
     const usersList = document.getElementById('usersList');
     usersList.innerHTML = '';
-    
-    const uniqueUsers = [...new Set(messages.map(m => m.username))];
+
+    const uniqueUsers = [...new Set(messages.filter(m => m.username !== 'admin').map(m => m.username))];
     uniqueUsers.forEach(username => {
         const userEl = document.createElement('div');
         userEl.className = 'user-item';
@@ -30,22 +31,8 @@ function loadUsers() {
 }
 
 function selectUser(username) {
-    document.querySelectorAll('.user-item').forEach(el => el.classList.remove('active'));
-    event.target.classList.add('active');
-    
-    const chatArea = document.getElementById('chatArea');
-    chatArea.innerHTML = `
-        <div class="header">
-            <h2>Диалог с ${username}</h2>
-            <button class="close-dialog" onclick="closeDialog('${username}')">Закрыть диалог</button>
-        </div>
-        <div class="message-list" id="adminMessageList"></div>
-        <div class="message-input">
-            <textarea id="adminMessage" placeholder="Ответьте пользователю..." rows="3"></textarea>
-            <button id="adminSendBtn">Отправить</button>
-        </div>
+    selectedUser = username;
 
-function selectUser(username) {
     document.querySelectorAll('.user-item').forEach(el => el.classList.remove('active'));
     event.target.classList.add('active');
 
@@ -53,7 +40,7 @@ function selectUser(username) {
     chatArea.innerHTML = `
         <div class="header">
             <h2>Диалог с ${username}</h2>
-            <button class="close-dialog" onclick="closeDialog('${username}')">Закрыть диалог</button>
+            <button class="close-dialog" onclick="closeDialog()">Закрыть диалог</button>
         </div>
         <div class="message-list" id="adminMessageList"></div>
         <div class="message-input">
@@ -64,25 +51,32 @@ function selectUser(username) {
     loadConversation(username);
 
     // Обработчик отправки сообщения от администратора
-    document.getElementById('adminSendBtn').addEventListener('click', function() {
-        const messageText = document.getElementById('adminMessage').value.trim();
-        if (!messageText) return;
+    document.getElementById('adminSendBtn').addEventListener('click', sendAdminMessage);
+}
 
-        const newMessage = {
-            id: Date.now(),
-            username: 'admin',
-            message: messageText,
-            timestamp: new Date().toLocaleString(),
-            ip: '127.0.0.1', // В реальном приложении получите реальный IP
-            isAdmin: true,
-            targetUser: username
-        };
+function sendAdminMessage() {
+    if (!selectedUser) return;
 
-        messages.push(newMessage);
-        saveData();
-        document.getElementById('adminMessage').value = '';
-        loadConversation(username);
-    });
+    const messageText = document.getElementById('adminMessage').value.trim();
+    if (!messageText) {
+        alert('Введите текст ответа!');
+        return;
+    }
+
+    const newMessage = {
+        id: Date.now(),
+        username: 'admin',
+        message: messageText,
+        timestamp: new Date().toLocaleString(),
+        ip: '127.0.0.1',
+        isAdmin: true,
+        targetUser: selectedUser
+    };
+
+    messages.push(newMessage);
+    saveData();
+    document.getElementById('adminMessage').value = '';
+    loadConversation(selectedUser);
 }
 
 function loadConversation(username) {
@@ -107,24 +101,22 @@ function loadConversation(username) {
     });
 }
 
-function closeDialog(username) {
+function closeDialog() {
+    if (!selectedUser) return;
+
     // Удаляем все сообщения диалога
     messages = messages.filter(m =>
-        !(m.username === username || m.targetUser === username) ||
-        !(m.username === 'admin' || m.targetUser === 'admin')
+        !(m.username === selectedUser && m.targetUser === 'admin') &&
+        !(m.username === 'admin' && m.targetUser === selectedUser)
     );
     saveData();
 
     // Обновляем список пользователей и очищаем область чата
     loadUsers();
+    selectedUser = null;
     document.getElementById('chatArea').innerHTML = '<div class="no-selection">Выберите пользователя для начала диалога</div>';
 }
 
-// Вспомогательные функции
 function saveData() {
     localStorage.setItem('messages', JSON.stringify(messages));
-}
-
-function loadConversations() {
-    // Эта функция может быть расширена для отображения уведомлений о новых сообщениях
 }
