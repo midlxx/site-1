@@ -81,5 +81,5 @@ function startAutoRefresh() {
     setInterval(async () => {
         await loadData();
         loadMessages();
-    }, 5000); // Каждые 5 секунд проверяем обновления
+    }, 5000); // Каждые 5 секунд проверяем обновлени
 }
