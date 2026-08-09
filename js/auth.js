@@ -1,68 +1,25 @@
-// Инициализация хранилищ
-let users = JSON.parse(localStorage.getItem('users')) || [
-    { username: 'admin', password: 'admin', isAdmin: true }
-];
-let messages = JSON.parse(localStorage.getItem('messages')) || [];
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Авторизация</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        .form-group { margin: 10px 0; }
+        input { padding: 8px; width: 200px; margin: 5px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Авторизация чата</h1>
+    <div class="form-group">
+        <input type="text" id="username" placeholder="Логин">
+    </div>
+    <div class="form-group">
+        <input type="password" id="password" placeholder="Пароль">
+    </div>
+    <button onclick="login()">Войти</button>
 
-function saveData() {
-    localStorage.setItem('users', JSON.stringify(users));
-    localStorage.setItem('messages', JSON.stringify(messages));
-}
+    <script src="js/auth.js"></script>
+</body>
+</html>
 
-// Обработка формы входа
-document.addEventListener('DOMContentLoaded', function() {
-    const loginForm = document.getElementById('loginForm');
-    if (loginForm) {
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            handleLogin();
-        });
-    }
-
-    const registerForm = document.getElementById('registerForm');
-    if (registerForm) {
-        registerForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            handleRegister();
-        });
-    }
-});
-
-function handleLogin() {
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-
-    const user = users.find(u => u.username === username && u.password === password);
-
-    if (user) {
-        localStorage.setItem('currentUser', username);
-        if (user.isAdmin) {
-            window.location.href = 'admin.html';
-        } else {
-            window.location.href = 'user.html';
-        }
-    } else {
-        alert('Неверный логин или пароль!');
-    }
-}
-
-function handleRegister() {
-    const username = document.getElementById('regUsername').value;
-    const password = document.getElementById('regPassword').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
-
-    if (password !== confirmPassword) {
-        alert('Пароли не совпадают!');
-        return;
-    }
-
-    if (users.find(user => user.username === username)) {
-        alert('Пользователь с таким никнеймом уже существует!');
-        return;
-    }
-
-    users.push({ username, password, isAdmin: false });
-    saveData();
-    alert('Регистрация успешна! Теперь войдите в систему.');
-    window.location.href = 'index.html';
-}
