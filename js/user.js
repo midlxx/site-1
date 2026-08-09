@@ -47,3 +47,39 @@ async function sendMessage() {
 
 function loadMessages() {
     const messageList = document
+function loadMessages() {
+    const messageList = document.getElementById('messageList');
+    if (!messageList) {
+        console.error('Элемент #messageList не найден');
+        return;
+    }
+
+    messageList.innerHTML = '';
+
+    const userMessages = messages.filter(m =>
+        (m.username === localStorage.getItem('currentUser') && m.targetUser === 'admin') ||
+        (m.username === 'admin' && m.targetUser === localStorage.getItem('currentUser'))
+    );
+
+    userMessages.forEach(msg => {
+        const messageEl = document.createElement('div');
+        messageEl.className = msg.isAdmin ? 'message admin-message' : 'message user-message';
+        messageEl.innerHTML = `
+            <strong>${msg.isAdmin ? 'Администратор' : msg.username}</strong>
+            <span>${msg.timestamp}</span>
+            ${msg.ip ? `<small>IP: ${msg.ip}</small>` : ''}
+            <p>${msg.message}</p>
+        `;
+        messageList.appendChild(messageEl);
+    });
+
+    // Прокручиваем вниз к последнему сообщению
+    messageList.scrollTop = messageList.scrollHeight;
+}
+
+function startAutoRefresh() {
+    setInterval(async () => {
+        await loadData();
+        loadMessages();
+    }, 5000); // Каждые 5 секунд проверяем обновления
+}
