@@ -14,7 +14,7 @@ async function loadData() {
 async function saveData() {
     const data = { users: window.users, messages: window.messages };
     try {
-        await fetch('https://ваш-хостинг/update-data', {
+        await fetch('https://swer1.vercel.app/update-data', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
