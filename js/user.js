@@ -1,3 +1,11 @@
+// Инициализация данных
+let users = JSON.parse(localStorage.getItem('users')) || [];
+let messages = JSON.parse(localStorage.getItem('messages')) || [];
+
+function saveData() {
+    localStorage.setItem('messages', JSON.stringify(messages));
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const currentUser = localStorage.getItem('currentUser');
     if (!currentUser) {
@@ -60,8 +68,4 @@ function loadMessages() {
         `;
         messageList.appendChild(messageEl);
     });
-}
-
-function saveData() {
-    localStorage.setItem('messages', JSON.stringify(messages));
 }
