@@ -106,4 +106,87 @@ a:hover {
     border-top: 1px solid #ddd;
 }
 
+
 #userMessage {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    font-size: 16px;
+}
+
+#sendBtn {
+    margin-top: 10px;
+    float: right;
+}
+
+/* Стили для админ‑панели */
+.admin-container {
+    display: flex;
+    gap: 20px;
+    height: 600px;
+}
+
+.users-list {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow-y: auto;
+    background-color: white;
+}
+
+.user-item {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
+
+.user-item:hover {
+    background-color: #f5f5f5;
+}
+
+.user-item.active {
+    background-color: #e1f5fe;
+    font-weight: bold;
+}
+
+.chat-area {
+    flex: 3;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+}
+
+.no-selection {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    font-style: italic;
+}
+
+.close-dialog {
+    background-color: #e74c3c;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.close-dialog:hover {
+    background-color: #c0392b;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+}
