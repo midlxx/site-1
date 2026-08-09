@@ -68,3 +68,54 @@ function sendAdminMessage() {
         timestamp: new Date().toLocaleString(),
         ip: '127.0.0.1',
         isAdmin: true
+    , targetUser: selectedUser
+  };
+
+  messages.push(newMessage);
+  saveData();
+  document.getElementById('adminMessage').value = '';
+  loadConversation(selectedUser);
+}
+
+function loadConversation(username) {
+  const adminMessageList = document.getElementById('adminMessageList');
+  adminMessageList.innerHTML = '';
+
+
+  const conversation = messages.filter(m =>
+    (m.username === username && m.targetUser === 'admin') ||
+    (m.username === 'admin' && m.targetUser === username)
+  );
+
+  conversation.forEach(msg => {
+    const messageEl = document.createElement('div');
+    messageEl.className = msg.isAdmin ? 'message admin-message' : 'message user-message';
+    messageEl.innerHTML = `
+      <strong>${msg.isAdmin ? 'Администратор' : msg.username}</strong>
+      <span>${msg.timestamp}</span>
+      ${msg.ip ? `<small>IP: ${msg.ip}</small>` : ''}
+      <p>${msg.message}</p>
+    `;
+    adminMessageList.appendChild(messageEl);
+  });
+}
+
+function closeDialog() {
+  if (!selectedUser) return;
+
+  // Удаляем все сообщения диалога
+  messages = messages.filter(m =>
+    !(m.username === selectedUser && m.targetUser === 'admin') &&
+    !(m.username === 'admin' && m.targetUser === selectedUser)
+  );
+  saveData();
+
+  // Обновляем список пользователей и очищаем область чата
+  loadUsers();
+  selectedUser = null;
+  document.getElementById('chatArea').innerHTML = '<div class="no-selection">Выберите пользователя для начала диалога</div>';
+}
+
+function saveData() {
+  localStorage.setItem('messages', JSON.stringify(messages));
+}
