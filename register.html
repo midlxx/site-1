@@ -1,31 +1,29 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Регистрация</title>
-    <link rel="stylesheet" href="css/style.css">
+  <title>Регистрация</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Регистрация</h1>
-        <form id="registerForm">
-            <div class="form-group">
-                <label for="regUsername">Никнейм:</label>
-                <input type="text" id="regUsername" name="regUsername" required>
-            </div>
-            <div class="form-group">
-                <label for="regPassword">Пароль:</label>
-                <input type="password" id="regPassword" name="regPassword" required>
-            </div>
-            <div class="form-group">
-                <label for="confirmPassword">Подтвердите пароль:</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" required>
-            </div>
-            <button type="submit">Зарегистрироваться</button>
-        </form>
-        <p><a href="index.html">Назад к входу</a></p>
+  <div class="container">
+    <h1>Регистрация нового пользователя</h1>
+    
+    <div class="form-group">
+      <input type="text" id="regUsername" placeholder="Логин" required>
     </div>
-    <script src="js/auth.js"></script>
+    <div class="form-group">
+      <input type="password" id="regPassword" placeholder="Пароль" required>
+    </div>
+    <div class="form-group">
+      <input type="password" id="confirmPassword" placeholder="Подтвердите пароль" required>
+    </div>
+    <button onclick="register(event)">Зарегистрироваться</button>
+    
+    <div style="margin-top: 20px;">
+      <a href="index.html">Назад к входу</a>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
 </body>
 </html>
