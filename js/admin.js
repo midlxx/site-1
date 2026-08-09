@@ -140,3 +140,14 @@ function sendAdminMessage() {
     document.getElementById('adminMessage').value = '';
     loadConversation(selectedUser);
 }
+
+function closeDialog() {
+    if (!selectedUser) return;
+
+    selectedUser = null;
+    const chatArea = document.getElementById('chatArea');
+    if (chatArea) {
+        chatArea.innerHTML = '<div class="no-selection">Выберите пользователя для начала диалога</div>';
+    }
+    loadUsers();
+}
