@@ -7,13 +7,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('userGreeting').textContent = currentUser;
 
-    // Загрузка сообщений
     loadMessages();
 
-    // Отправка сообщения
     document.getElementById('sendBtn').addEventListener('click', sendMessage);
-
-    // Выход
     document.getElementById('logoutBtn').addEventListener('click', function(e) {
         e.preventDefault();
         localStorage.removeItem('currentUser');
@@ -33,9 +29,9 @@ function sendMessage() {
         username: localStorage.getItem('currentUser'),
         message: messageText,
         timestamp: new Date().toLocaleString(),
-        ip: getClientIP(), // Функция для получения IP
+        ip: '127.0.0.1',
         isAdmin: false,
-        targetUser: 'admin' // Сообщение отправляется администратору
+        targetUser: 'admin'
     };
 
     messages.push(newMessage);
@@ -66,13 +62,6 @@ function loadMessages() {
     });
 }
 
-// Вспомогательная функция для получения IP (в реальном приложении будет серверная)
-function getClientIP() {
-    // В реальном приложении используйте серверный API
-    return '127.0.0.1';
-}
-
 function saveData() {
     localStorage.setItem('messages', JSON.stringify(messages));
 }
-
