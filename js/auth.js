@@ -1,6 +1,6 @@
 async function loadData() {
     try {
-        const response = await fetch('https://ваш-хостинг/data.json');
+        const response = await fetch('https://swer1.vercel.app/data.json');
         const serverData = await response.json();
         window.users = serverData.users || [];
         window.messages = serverData.messages || [];
