@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Добро пожаловать, <span id="userGreeting"></span>!</h1>
+            <a href="#" id="logoutBtn">Выйти</a>
+        </header>
+        
+        <div class="chat-container">
+            <div class="message-list" id="messageList">
+                <!-- Здесь будут отображаться сообщения -->
+            </div>
+            
+            <div class="message-input">
+                <textarea id="userMessage" placeholder="Напишите сообщение администратору..." rows="3"></textarea>
+                <button id="sendBtn">Отправить</button>
+            </div>
+        </div>
+    </div>
+    <script src="js/user.js"></script>
+</body>
+</html>
