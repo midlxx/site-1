@@ -1,39 +1,65 @@
-const fs = require('fs').promises;
-const path = require('path');
+import { createClient } from '@supabase/supabase-js';
 
-module.exports = async (req, res) => {
+// Создаем клиент Supabase. 
+// ВАЖНО: Для API-роутов (сервера) используем SUPABASE_SECRET_KEY
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SECRET_KEY // <-- Это секретный ключ (sb_secret_...), НЕ anon/publishable!
+);
+
+// Экспортируем функцию-обработчик (стандартный формат Next.js)
+export default async function handler(req, res) {
+  // Разрешаем только POST-запросы (для безопасности)
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return res.status(405).json({ error: 'Метод не разрешен. Используйте POST.' });
   }
 
+  // Получаем данные из тела запроса (логин и пароль)
   const { username, password } = req.body;
 
+  // Валидация: проверяем, что поля заполнены
   if (!username || !password) {
-    return res.status(400).json({ error: 'Заполните все поля!' });
+    return res.status(400).json({ error: 'Пожалуйста, заполните все поля!' });
   }
 
   try {
-    const dataPath = path.join(__dirname, '../data.json');
-    const data = JSON.parse(await fs.readFile(dataPath, 'utf8'));
+    // 1. Проверяем, не существует ли уже пользователь с таким логином
+    const { data: existingUser, error: checkError } = await supabase
+      .from('users') // Название вашей таблицы
+      .select('id')
+      .eq('username', username)
+      .single();
 
-    // Проверяем, существует ли пользователь
-    const existingUser = data.users.find(u => u.username === username);
     if (existingUser) {
-      return res.status(409).json({ error: 'Пользователь с таким логином уже существует!' });
+      return res.status(409).json({ error: 'Пользователь с таким логином уже зарегистрирован.' });
     }
 
-    // Добавляем нового пользователя
-    data.users.push({
-      username: username,
-      password: password,
-      isAdmin: false
+    // 2. Создаем нового пользователя в таблице
+    const { data, error } = await supabase
+      .from('users')
+      .insert([
+        {
+          username: username,
+          password: password, // В реальном проекте здесь должен быть хеш пароля!
+          is_admin: false
+        }
+      ])
+      .select();
+
+    if (error) {
+      console.error('Ошибка при сохранении в БД:', error);
+      return res.status(500).json({ error: 'Произошла ошибка при регистрации.' });
+    }
+
+    // 3. Успешный ответ
+    res.status(201).json({
+      success: true,
+      message: 'Регистрация прошла успешно!',
+      user: data
     });
 
-    await fs.writeFile(dataPath, JSON.stringify(data, null, 2));
-
-    res.json({ success: true, message: 'Регистрация успешна!' });
   } catch (error) {
-    console.error('Ошибка регистрации:', error);
-    res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    console.error('Критическая ошибка:', error);
+    res.status(500).json({ error: 'Внутренняя ошибка сервера.' });
   }
-};
+}
