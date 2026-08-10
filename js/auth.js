@@ -20,8 +20,29 @@ async function loadData() {
 }
 
 async function saveData() {
-  // В реальной системе здесь будет запрос к серверу
-  console.warn('Реальное сохранение требует серверного API');
+  const data = { users: window.users, tickets: window.tickets };
+
+  try {
+    // Попытка сохранить через fetch (работает только на сервере)
+    const response = await fetch('data.json', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (response.ok) {
+      console.log('Данные успешно сохранены в data.json');
+    } else {
+      throw new Error('Ошибка сохранения: ' + response.status);
+    }
+  } catch (error) {
+    console.warn('Сохранение не удалось (требуется сервер):', error);
+    // Для локальной разработки сохраняем в LocalStorage
+    localStorage.setItem('chatAppData', JSON.stringify(data));
+    console.log('Данные сохранены в LocalStorage');
+  }
 }
 
 function login(event) {
@@ -89,9 +110,9 @@ function register(event) {
       isAdmin: false
     });
 
-    saveData();
-
-    alert('Регистрация успешна! Теперь войдите в систему.');
-    window.location.href = 'index.html';
+    saveData().then(() => {
+      alert('Регистрация успешна! Теперь войдите в систему.');
+      window.location.href = 'index.html';
+    });
   });
 }
