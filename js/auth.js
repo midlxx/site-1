@@ -78,7 +78,7 @@ function register(event) {
 
     saveData();
 
-    alert('Регистрация успешна! Теперь войдите в систему.';
+    alert('Регистрация успешна! Теперь войдите в систему.');
     window.location.href = 'index.html';
-    });
-    }
+  });
+}
