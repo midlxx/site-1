@@ -4,3 +4,15 @@
   ],
   "messages": []
 }
+{
+  "users": [
+    {"username": "yola", "password": "1234567", "isAdmin": false}
+  ],
+  "messages": []
+}
+{
+  "users": [
+    {"username": "_swer1", "password": "1111", "isAdmin": false}
+  ],
+  "messages": []
+}
