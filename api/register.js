@@ -1,20 +1,20 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Создаем клиент Supabase. 
-// ВАЖНО: Для API-роутов (сервера) используем SUPABASE_SECRET_KEY
+// Создаем клиент Supabase
+// ВАЖНО: Для API-роутов используем SUPABASE_SECRET_KEY
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_SECRET_KEY // <-- Это секретный ключ (sb_secret_...), НЕ anon/publishable!
+  process.env.SUPABASE_SECRET_KEY
 );
 
-// Экспортируем функцию-обработчик (стандартный формат Next.js)
+// Экспортируем обработчик (стандартный формат Next.js)
 export default async function handler(req, res) {
-  // Разрешаем только POST-запросы (для безопасности)
+  // Разрешаем только POST-запросы
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Метод не разрешен. Используйте POST.' });
   }
 
-  // Получаем данные из тела запроса (логин и пароль)
+  // Получаем данные из тела запроса
   const { username, password } = req.body;
 
   // Валидация: проверяем, что поля заполнены
@@ -25,7 +25,7 @@ export default async function handler(req, res) {
   try {
     // 1. Проверяем, не существует ли уже пользователь с таким логином
     const { data: existingUser, error: checkError } = await supabase
-      .from('users') // Название вашей таблицы
+      .from('users') // <-- Укажите точное имя вашей таблицы в Supabase
       .select('id')
       .eq('username', username)
       .single();
@@ -34,13 +34,13 @@ export default async function handler(req, res) {
       return res.status(409).json({ error: 'Пользователь с таким логином уже зарегистрирован.' });
     }
 
-    // 2. Создаем нового пользователя в таблице
+    // 2. Создаем нового пользователя в базе данных Supabase
     const { data, error } = await supabase
       .from('users')
       .insert([
         {
           username: username,
-          password: password, // В реальном проекте здесь должен быть хеш пароля!
+          password: password, // ВНИМАНИЕ: В реальном проекте здесь должен быть хеш пароля!
           is_admin: false
         }
       ])
@@ -59,7 +59,7 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error('Критическая ошибка:', error);
+    console.error('Критическая ошибка сервера:', error);
     res.status(500).json({ error: 'Внутренняя ошибка сервера.' });
   }
 }
