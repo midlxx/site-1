@@ -1,18 +1,15 @@
 {
   "users": [
-    {"username": "admin", "password": "admin", "isAdmin": true}
-  ],
-  "tickets": []
-}
-{
-  "users": [
-    {"username": "test", "password": "test", "isAdmin": false}
-  ],
-  "tickets": []
-}
-{
-  "users": [
-    {"username": "yola", "password": "1234567", "isAdmin": false}
+    {
+      "username": "admin",
+      "password": "admin",
+      "isAdmin": true
+    },
+    {
+      "username": "testuser",
+      "password": "12345",
+      "isAdmin": false
+    }
   ],
   "tickets": []
 }
