@@ -1,23 +1,23 @@
 let users = [];
-let messages = [];
+let tickets = [];
 
 async function loadData() {
   try {
     const response = await fetch('data.json');
     const serverData = await response.json();
     window.users = serverData.users || [];
-    window.messages = serverData.messages || [];
+    window.tickets = serverData.tickets || [];
     users = window.users;
-    messages = window.messages;
+    tickets = window.tickets;
   } catch (error) {
     console.error('Ошибка загрузки данных:', error);
     users = [];
-    messages = [];
+    tickets = [];
   }
 }
 
 async function saveData() {
-  const data = { users: window.users, messages: window.messages };
+  const data = { users: window.users, tickets: window.tickets };
   console.warn('Сохранение на облачный диск требует API‑доступа');
 }
 
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     document.getElementById('userGreeting').textContent = `Добро пожаловать, ${currentUser}!`;
-    loadMessages();
+    loadTicket();
     startAutoRefresh();
 
     document.getElementById('sendBtn').addEventListener('click', sendMessage);
@@ -42,43 +42,24 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-async function sendMessage() {
-  const targetUser = document.getElementById('targetUser').value.trim();
-  const messageText = document.getElementById('userMessage').value.trim();
-
-  if (!targetUser) {
-    alert('Введите ник получателя!');
-    return;
+function getCurrentTicket() {
+  // Находим тикет пользователя (создаём, если не существует)
+  let ticket = tickets.find(t => t.username === currentUser);
+  if (!ticket) {
+    ticket = {
+      id: Date.now(),
+      username: currentUser,
+      status: 'open',
+      messages: [],
+      createdAt: new Date().toLocaleString()
+    };
+    tickets.push(ticket);
+    saveData();
   }
-  if (!messageText) {
-    alert('Введите текст сообщения!');
-    return;
-  }
-
-  // Проверяем существование получателя
-  const recipient = users.find(u => u.username === targetUser);
-  if (!recipient) {
-    alert('Пользователь с таким ником не найден!');
-    return;
-  }
-
-  const newMessage = {
-    id: Date.now(),
-    username: currentUser,
-    message: messageText,
-    timestamp: new Date().toLocaleString(),
-    ip: '127.0.0.1',
-    isAdmin: false,
-    targetUser: targetUser
-  };
-
-  messages.push(newMessage);
-  await saveData();
-  document.getElementById('userMessage').value = '';
-  loadMessages();
+  return ticket;
 }
 
-function loadMessages() {
+function loadTicket() {
   const messageList = document.getElementById('messageList');
   if (!messageList) {
     console.error('Элемент #messageList не найден');
@@ -87,13 +68,9 @@ function loadMessages() {
 
   messageList.innerHTML = '';
 
-  const currentUser = localStorage.getItem('currentUser');
-  const userMessages = messages.filter(m =>
-    (m.username === currentUser) ||
-    (m.targetUser === currentUser)
-  );
+  const ticket = getCurrentTicket();
 
-  userMessages.forEach(msg => {
+  ticket.messages.forEach(msg => {
     const messageEl = document.createElement('div');
     messageEl.className = msg.isAdmin ? 'message admin-message' : 'message user-message';
     messageEl.innerHTML = `
@@ -101,7 +78,6 @@ function loadMessages() {
       <span>${msg.timestamp}</span>
       ${msg.ip ? `<small>IP: ${msg.ip}</small>` : ''}
       <p>${msg.message}</p>
-      <small>Кому: ${msg.targetUser}</small>
     `;
     messageList.appendChild(messageEl);
   });
@@ -110,9 +86,32 @@ function loadMessages() {
   messageList.scrollTop = messageList.scrollHeight;
 }
 
+async function sendMessage() {
+  const messageText = document.getElementById('userMessage').value.trim();
+  if (!messageText) {
+    alert('Введите текст сообщения!');
+    return;
+  }
+
+  const ticket = getCurrentTicket();
+  const newMessage = {
+    id: Date.now(),
+    username: currentUser,
+    message: messageText,
+    timestamp: new Date().toLocaleString(),
+    ip: '127.0.0.1',
+    isAdmin: false
+  };
+
+  ticket.messages.push(newMessage);
+  await saveData();
+  document.getElementById('userMessage').value = '';
+  loadTicket();
+}
+
 function startAutoRefresh() {
   setInterval(async () => {
     await loadData();
-    loadMessages();
-  }, 5000); // Каждые 5 секунд проверяем обновления
+    loadTicket();
+  }, 5000); // Каждые 5 секунд проверяем обновления
 }
