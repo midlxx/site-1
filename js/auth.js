@@ -3,16 +3,16 @@ async function loadData() {
     const response = await fetch('data.json');
     const serverData = await response.json();
     window.users = serverData.users || [];
-    window.messages = serverData.messages || [];
+    window.tickets = serverData.tickets || [];
   } catch (error) {
     console.error('Ошибка загрузки данных:', error);
     window.users = [{ username: 'admin', password: 'admin', isAdmin: true }];
-    window.messages = [];
+    window.tickets = [];
   }
 }
 
 async function saveData() {
-  const data = { users: window.users, messages: window.messages };
+  const data = { users: window.users, tickets: window.tickets };
   console.warn('Сохранение на облачный диск требует API‑доступа');
 }
 
@@ -78,7 +78,7 @@ function register(event) {
 
     saveData();
 
-    alert('Регистрация успешна! Теперь войдите в систему.');
+    alert('Регистрация успешна! Теперь войдите в систему.';
     window.location.href = 'index.html';
-  });
-}
+    });
+    }
