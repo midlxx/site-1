@@ -43,20 +43,33 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 async function sendMessage() {
+  const targetUser = document.getElementById('targetUser').value.trim();
   const messageText = document.getElementById('userMessage').value.trim();
+
+  if (!targetUser) {
+    alert('Введите ник получателя!');
+    return;
+  }
   if (!messageText) {
     alert('Введите текст сообщения!');
     return;
   }
 
+  // Проверяем существование получателя
+  const recipient = users.find(u => u.username === targetUser);
+  if (!recipient) {
+    alert('Пользователь с таким ником не найден!');
+    return;
+  }
+
   const newMessage = {
     id: Date.now(),
-    username: localStorage.getItem('currentUser'),
+    username: currentUser,
     message: messageText,
     timestamp: new Date().toLocaleString(),
     ip: '127.0.0.1',
     isAdmin: false,
-    targetUser: 'admin'
+    targetUser: targetUser
   };
 
   messages.push(newMessage);
@@ -76,8 +89,8 @@ function loadMessages() {
 
   const currentUser = localStorage.getItem('currentUser');
   const userMessages = messages.filter(m =>
-    (m.username === currentUser && m.targetUser === 'admin') ||
-    (m.username === 'admin' && m.targetUser === currentUser)
+    (m.username === currentUser) ||
+    (m.targetUser === currentUser)
   );
 
   userMessages.forEach(msg => {
@@ -88,6 +101,7 @@ function loadMessages() {
       <span>${msg.timestamp}</span>
       ${msg.ip ? `<small>IP: ${msg.ip}</small>` : ''}
       <p>${msg.message}</p>
+      <small>Кому: ${msg.targetUser}</small>
     `;
     messageList.appendChild(messageEl);
   });
