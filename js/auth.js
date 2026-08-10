@@ -72,9 +72,6 @@ function register(event) {
     // Добавляем нового пользователя
     window.users.push({
       username: username,
-    // Добавляем нового пользователя
-    window.users.push({
-      username: username,
       password: password,
       isAdmin: false
     });
