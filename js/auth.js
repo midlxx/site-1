@@ -1,19 +1,27 @@
 async function loadData() {
   try {
     const response = await fetch('data.json');
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
     const serverData = await response.json();
     window.users = serverData.users || [];
     window.tickets = serverData.tickets || [];
+
+    console.log('Данные успешно загружены из data.json');
   } catch (error) {
-    console.error('Ошибка загрузки данных:', error);
+    console.error('Критическая ошибка загрузки данных:', error);
+    // Резервные данные: только админ
     window.users = [{ username: 'admin', password: 'admin', isAdmin: true }];
     window.tickets = [];
   }
 }
 
 async function saveData() {
-  const data = { users: window.users, tickets: window.tickets };
-  console.warn('Сохранение на облачный диск требует API‑доступа');
+  // В реальной системе здесь будет запрос к серверу
+  console.warn('Реальное сохранение требует серверного API');
 }
 
 function login(event) {
@@ -28,16 +36,23 @@ function login(event) {
   }
 
   loadData().then(() => {
-    const user = window.users.find(u => u.username === username && u.password === password);
+    console.log('Загруженные пользователи:', window.users);
+
+    const user = window.users.find(u =>
+      u.username === username && u.password === password
+    );
 
     if (user) {
       localStorage.setItem('currentUser', username);
+      console.log('Успешный вход пользователя:', username);
+
       if (username === 'admin') {
         window.location.href = 'admin.html';
       } else {
         window.location.href = 'user.html';
       }
     } else {
+      console.warn('Неверный логин или пароль для:', username);
       alert('Неверный логин или пароль!');
     }
   });
@@ -61,7 +76,6 @@ function register(event) {
   }
 
   loadData().then(() => {
-    // Проверяем, существует ли пользователь
     const existingUser = window.users.find(u => u.username === username);
 
     if (existingUser) {
@@ -69,7 +83,6 @@ function register(event) {
       return;
     }
 
-    // Добавляем нового пользователя
     window.users.push({
       username: username,
       password: password,
