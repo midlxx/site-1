@@ -34,14 +34,14 @@ button:hover {
   background: #0056b3;
 }
 
-/* Стили для чата */
+/* Стили для чата/тикетов */
 .chat-container {
   display: flex;
   flex-direction: column;
   height: 80vh;
 }
 
-#messageList {
+#ticketList, #messageList {
   flex: 1;
   overflow-y: auto;
   border: 1px solid #ddd;
@@ -64,37 +64,31 @@ button:hover {
   background: #f3e5f5;
 }
 
-/* Стили для админ‑панели */
-.admin-container {
-  display: flex;
-  height: 90vh;
-}
-
-#usersList {
-  width: 250px;
-  border-right: 1px solid #ccc;
-  overflow-y: auto;
-}
-
-.user-item {
+.ticket {
   padding: 12px;
-  cursor: pointer;
   border-bottom: 1px solid #eee;
+  cursor: pointer;
 }
 
-.user-item:hover {
-  background: #f8f9fa;
-}
-
-.user-item.active {
+.ticket.active {
   background: #e3f2fd;
   font-weight: bold;
 }
 
-.no-selection {
-  text-align: center;
-  padding: 40px;
-  color: #666;
+.ticket-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status-open {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.status-closed {
+  color: #dc3545;
+  font-weight: bold;
 }
 
 .header {
@@ -121,21 +115,10 @@ button:hover {
   border-top: 1px solid #ccc;
 }
 
-#adminMessage {
+#userMessage, #adminMessage {
   flex: 1;
 }
 
-#adminSendBtn {
+#sendBtn, #adminSendBtn {
   padding: 10px 20px;
-}
-
-/* Форма поиска пользователя */
-.search-user {
-  padding: 15px;
-  border-bottom: 1px solid #ccc;
-}
-
-.search-input {
-  width: calc(100% - 22px);
-  margin-bottom: 10px;
 }
