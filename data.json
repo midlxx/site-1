@@ -4,3 +4,15 @@
   ],
   "tickets": []
 }
+{
+  "users": [
+    {"username": "test", "password": "test", "isAdmin": false}
+  ],
+  "tickets": []
+}
+{
+  "users": [
+    {"username": "yola", "password": "1234567", "isAdmin": false}
+  ],
+  "tickets": []
+}
