@@ -4,11 +4,6 @@
       "username": "admin",
       "password": "admin",
       "isAdmin": true
-    },
-    {
-      "username": "testuser",
-      "password": "12345",
-      "isAdmin": false
     }
   ],
   "tickets": []
