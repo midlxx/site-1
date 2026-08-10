@@ -64,7 +64,7 @@ button:hover {
   background: #f3e5f5;
 }
 
-/* Стили для админ-панели */
+/* Стили для админ‑панели */
 .admin-container {
   display: flex;
   height: 90vh;
@@ -127,4 +127,15 @@ button:hover {
 
 #adminSendBtn {
   padding: 10px 20px;
+}
+
+/* Форма поиска пользователя */
+.search-user {
+  padding: 15px;
+  border-bottom: 1px solid #ccc;
+}
+
+.search-input {
+  width: calc(100% - 22px);
+  margin-bottom: 10px;
 }
