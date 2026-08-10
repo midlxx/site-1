@@ -1,20 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Админ‑панель чата</title>
+  <title>Админ‑панель тикетов</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <div class="admin-container">
-    <div>
-      <div class="search-user">
-        <input type="text" class="search-input" id="searchUser" placeholder="Поиск пользователя по нику">
-        <button onclick="searchUser()">Найти</button>
+    <div style="width: 300px; border-right: 1px solid #ccc; overflow-y: auto;">
+      <div style="padding: 15px; border-bottom: 1px solid #ccc;">
+        <h3>Открытые тикеты</h3>
       </div>
-      <div id="usersList"></div>
+      <div id="ticketsList"></div>
     </div>
-    <div id="chatArea">
-      <div class="no-selection">Выберите пользователя для начала диалога</div>
+    <div id="ticketArea">
+      <div class="no-selection">Выберите тикет для просмотра</div>
     </div>
   </div>
 
