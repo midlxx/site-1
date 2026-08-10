@@ -44,7 +44,18 @@ function initializeAdminPanel() {
   startAutoRefresh();
 }
 
-function loadUsers() {
+function searchUser() {
+  const searchTerm = document.getElementById('searchUser').value.trim().toLowerCase();
+  loadUsers(searchTerm);
+}
+
+function loadUsers(searchTerm = '') {
+  const usersList = document.getElementById('usersList');
+  if (!usersList) {
+    console.error('Элемент #usersList не найден');
+    return;
+  }
+  function loadUsers(searchTerm = '') {
   const usersList = document.getElementById('usersList');
   if (!usersList) {
     console.error('Элемент #usersList не найден');
@@ -53,15 +64,34 @@ function loadUsers() {
 
   usersList.innerHTML = '';
 
-  const uniqueUsers = [...new Set(messages.filter(m => m.username !== 'admin').map(m => m.username))];
+  // Получаем всех пользователей из сообщений (исключая админа)
+  const uniqueUsers = [...new Set(messages
+    .filter(m => m.username !== 'admin' && m.targetUser !== 'admin')
+    .map(m => m.username)
+  )];
 
-  uniqueUsers.forEach(username => {
+  // Фильтруем по поисковому запросу, если он есть
+  const filteredUsers = searchTerm
+    ? uniqueUsers.filter(username =>
+        username.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : uniqueUsers;
+
+  filteredUsers.forEach(username => {
     const userEl = document.createElement('div');
     userEl.className = 'user-item';
     userEl.textContent = username;
     userEl.addEventListener('click', (e) => selectUser(username, e));
     usersList.appendChild(userEl);
   });
+
+  if (filteredUsers.length === 0) {
+    const noResults = document.createElement('div');
+    noResults.textContent = 'Пользователи не найдены';
+    noResults.style.padding = '15px';
+    noResults.style.color = '#666';
+    usersList.appendChild(noResults);
+  }
 }
 
 function selectUser(username, event) {
@@ -73,21 +103,6 @@ function selectUser(username, event) {
   updateChatInterface(username);
 }
 
-function updateChatInterface(username) {
-  const chatArea = document.getElementById('chatArea');
-  if (!chatArea) {
-    console.error('Элемент #chatArea не найден');
-    return;
-  }
-
-  chatArea.innerHTML = `
-    <div class="header">
-      <h2>Диалог с ${username}</h2>
-      <button class="close-dialog" onclick="closeDialog()">Закрыть диалог</button>
-    </div>
-    <div class="message-list" id="adminMessageList"></div>
-    <div class="message-input">
-      <textarea id="adminMessage
 function updateChatInterface(username) {
   const chatArea = document.getElementById('chatArea');
   if (!chatArea) {
@@ -128,7 +143,7 @@ function loadConversation(username) {
   const conversation = messages.filter(m =>
     (m.username === username && m.targetUser === 'admin') ||
     (m.username === 'admin' && m.targetUser === username)
-  );
+  ).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
 
   conversation.forEach(msg => {
     const messageEl = document.createElement('div');
@@ -190,5 +205,5 @@ function startAutoRefresh() {
     if (selectedUser) {
       loadConversation(selectedUser);
     }
-  }, 5000); // Каждые 5 секунд проверяем обновления
+  }, 5000); // Каждые 5 секунд проверяем обновления
 }
